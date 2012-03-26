@@ -8,6 +8,8 @@
       <object class="GtkBox" id="box1">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
+        <property name="margin_right">20</property>
+        <property name="margin_bottom">10</property>
         <property name="orientation">vertical</property>
         <child>
           <object class="GtkLabel" id="label1">
@@ -32,6 +34,7 @@
             <property name="xalign">0</property>
             <property name="active">True</property>
             <property name="draw_indicator">True</property>
+            <property name="group">radiobutton2</property>
           </object>
           <packing>
             <property name="expand">False</property>
@@ -540,14 +543,13 @@
           <object class="GtkBox" id="box3">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <property name="margin_top">8</property>
+            <property name="margin_top">10</property>
             <child>
               <object class="GtkButton" id="button2">
                 <property name="label">gtk-ok</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
-                <property name="margin_right">20</property>
                 <property name="use_action_appearance">False</property>
                 <property name="use_stock">True</property>
               </object>
