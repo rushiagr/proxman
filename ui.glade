@@ -268,7 +268,6 @@
                   <object class="GtkEntry" id="proxy_textbox2">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
-                    <property name="editable">False</property>
                     <property name="invisible_char">●</property>
                     <property name="invisible_char_set">True</property>
                   </object>
@@ -284,7 +283,6 @@
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="margin_top">5</property>
-                    <property name="editable">False</property>
                     <property name="invisible_char">●</property>
                     <property name="invisible_char_set">True</property>
                   </object>
@@ -299,7 +297,6 @@
                   <object class="GtkEntry" id="pword_textbox2">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
-                    <property name="editable">False</property>
                     <property name="visibility">False</property>
                     <property name="invisible_char">●</property>
                     <property name="invisible_char_set">True</property>
@@ -378,7 +375,6 @@
                   <object class="GtkEntry" id="port_textbox2">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
-                    <property name="editable">False</property>
                     <property name="invisible_char">●</property>
                   </object>
                   <packing>
@@ -426,7 +422,6 @@
                   <object class="GtkEntry" id="proxy_textbox3">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
-                    <property name="editable">False</property>
                     <property name="invisible_char">●</property>
                     <property name="invisible_char_set">True</property>
                   </object>
@@ -442,7 +437,6 @@
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="margin_top">5</property>
-                    <property name="editable">False</property>
                     <property name="invisible_char">●</property>
                     <property name="invisible_char_set">True</property>
                   </object>
@@ -457,7 +451,6 @@
                   <object class="GtkEntry" id="pword_textbox3">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
-                    <property name="editable">False</property>
                     <property name="visibility">False</property>
                     <property name="invisible_char">●</property>
                     <property name="invisible_char_set">True</property>
@@ -536,7 +529,6 @@
                   <object class="GtkEntry" id="port_textbox3">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
-                    <property name="editable">False</property>
                     <property name="invisible_char">●</property>
                   </object>
                   <packing>

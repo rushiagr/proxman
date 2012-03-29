@@ -41,9 +41,10 @@ class ProxyMan:
 
     def useProxy(self, widget):
         self.builder.get_object("grid1").set_sensitive(True)
-        self.builder.get_object("grid2").set_sensitive(True)
-        self.builder.get_object("grid3").set_sensitive(True)
         self.builder.get_object("checkbutton4").set_sensitive(True)
+        if self.builder.get_object("checkbutton4").get_active() == False:
+            self.builder.get_object("grid2").set_sensitive(True)
+            self.builder.get_object("grid3").set_sensitive(True)
         
     def useSameProxy(self, widget):
         if self.builder.get_object("grid2").get_sensitive() == True:
@@ -66,32 +67,6 @@ class ProxyMan:
             self.builder.get_object("checkbutton2").set_active(True)
             self.builder.get_object("checkbutton3").set_active(True)
         
-#        if self.builder.get_object("checkbutton4").get_active() == True:
-#            self.builder.get_object("proxy_textbox2").set_editable(False)
-#            self.builder.get_object("port_textbox2").set_editable(False)
-#            self.builder.get_object("uname_textbox2").set_editable(False)
-#            self.builder.get_object("pword_textbox2").set_editable(False)
-#            self.builder.get_object("proxy_textbox3").set_editable(False)
-#            self.builder.get_object("port_textbox3").set_editable(False)
-#            self.builder.get_object("uname_textbox3").set_editable(False)
-#            self.builder.get_object("pword_textbox3").set_editable(False)
-#        else:
-#            self.builder.get_object("proxy_textbox2").set_editable(True)
-#            self.builder.get_object("port_textbox2").set_editable(True)
-#            self.builder.get_object("uname_textbox2").set_editable(True)
-#            self.builder.get_object("pword_textbox2").set_editable(True)
-#            self.builder.get_object("proxy_textbox3").set_editable(True)
-#            self.builder.get_object("port_textbox3").set_editable(True)
-#            self.builder.get_object("uname_textbox3").set_editable(True)
-#            self.builder.get_object("pword_textbox3").set_editable(True)
-#        if self.builder.get_object("checkbutton1").get_active() == True:
-#            self.builder.get_object("checkbutton2").set_active(True)
-#            self.builder.get_object("checkbutton3").set_active(True)
-#        else:
-#            self.builder.get_object("checkbutton2").set_active(False)
-#            self.builder.get_object("checkbutton3").set_active(False)
-#        
-
     def toggleAuth1(self, widget):
         if self.builder.get_object("uname_label1").get_sensitive() == True:
             self.builder.get_object("uname_label1").set_sensitive(False)
@@ -117,7 +92,7 @@ class ProxyMan:
             self.builder.get_object("pword_label2").set_sensitive(False)
             self.builder.get_object("uname_textbox2").set_sensitive(False)
             self.builder.get_object("pword_textbox2").set_sensitive(False)
-        else:
+        elif self.builder.get_object("checkbutton4").get_active() == False:
             self.builder.get_object("uname_label2").set_sensitive(True)
             self.builder.get_object("pword_label2").set_sensitive(True)
             self.builder.get_object("uname_textbox2").set_sensitive(True)
@@ -129,7 +104,7 @@ class ProxyMan:
             self.builder.get_object("pword_label3").set_sensitive(False)
             self.builder.get_object("uname_textbox3").set_sensitive(False)
             self.builder.get_object("pword_textbox3").set_sensitive(False)
-        else:
+        elif self.builder.get_object("checkbutton4").get_active() == False:
             self.builder.get_object("uname_label3").set_sensitive(True)
             self.builder.get_object("pword_label3").set_sensitive(True)
             self.builder.get_object("uname_textbox3").set_sensitive(True)
