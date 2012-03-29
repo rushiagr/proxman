@@ -8,9 +8,9 @@
       <object class="GtkBox" id="box1">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
-        <property name="margin_right">20</property>
-        <property name="margin_bottom">10</property>
+        <property name="margin_right">10</property>
         <property name="orientation">vertical</property>
+        <signal name="destroy" handler="on_quit_window" swapped="no"/>
         <child>
           <object class="GtkLabel" id="label1">
             <property name="visible">True</property>
@@ -32,9 +32,9 @@
             <property name="margin_left">10</property>
             <property name="use_action_appearance">False</property>
             <property name="xalign">0</property>
-            <property name="active">True</property>
             <property name="draw_indicator">True</property>
             <property name="group">radiobutton2</property>
+            <signal name="clicked" handler="radio_click_no_proxy" swapped="no"/>
           </object>
           <packing>
             <property name="expand">False</property>
@@ -53,6 +53,7 @@
             <property name="xalign">0</property>
             <property name="active">True</property>
             <property name="draw_indicator">True</property>
+            <signal name="clicked" handler="radio_click_use_proxy" swapped="no"/>
           </object>
           <packing>
             <property name="expand">False</property>
@@ -90,10 +91,11 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkEntry" id="entry1">
+                  <object class="GtkEntry" id="proxy_textbox1">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="invisible_char">●</property>
+                    <signal name="changed" handler="proxy_textbox1_changed" swapped="no"/>
                   </object>
                   <packing>
                     <property name="left_attach">1</property>
@@ -103,11 +105,12 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkEntry" id="entry2">
+                  <object class="GtkEntry" id="uname_textbox1">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="margin_top">5</property>
                     <property name="invisible_char">●</property>
+                    <signal name="changed" handler="uname_textbox1_changed" swapped="no"/>
                   </object>
                   <packing>
                     <property name="left_attach">3</property>
@@ -117,10 +120,12 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkEntry" id="entry3">
+                  <object class="GtkEntry" id="pword_textbox1">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
+                    <property name="visibility">False</property>
                     <property name="invisible_char">●</property>
+                    <signal name="changed" handler="pword_textbox1_changed" swapped="no"/>
                   </object>
                   <packing>
                     <property name="left_attach">3</property>
@@ -145,7 +150,7 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkLabel" id="label4">
+                  <object class="GtkLabel" id="uname_label1">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="xalign">1</property>
@@ -167,7 +172,9 @@
                     <property name="margin_left">80</property>
                     <property name="use_action_appearance">False</property>
                     <property name="xalign">0</property>
+                    <property name="active">True</property>
                     <property name="draw_indicator">True</property>
+                    <signal name="toggled" handler="toggle_auth1" swapped="no"/>
                   </object>
                   <packing>
                     <property name="left_attach">0</property>
@@ -177,7 +184,7 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkLabel" id="label5">
+                  <object class="GtkLabel" id="pword_label1">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="xalign">1</property>
@@ -191,10 +198,11 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkEntry" id="entry10">
+                  <object class="GtkEntry" id="port_textbox1">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="invisible_char">●</property>
+                    <signal name="changed" handler="port_textbox1_changed" swapped="no"/>
                   </object>
                   <packing>
                     <property name="left_attach">3</property>
@@ -222,7 +230,9 @@
                 <property name="margin_left">24</property>
                 <property name="use_action_appearance">False</property>
                 <property name="xalign">0</property>
+                <property name="active">True</property>
                 <property name="draw_indicator">True</property>
+                <signal name="toggled" handler="toggle_use_same_proxy" swapped="no"/>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -255,9 +265,10 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkEntry" id="entry4">
+                  <object class="GtkEntry" id="proxy_textbox2">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
+                    <property name="editable">False</property>
                     <property name="invisible_char">●</property>
                     <property name="invisible_char_set">True</property>
                   </object>
@@ -269,10 +280,11 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkEntry" id="entry5">
+                  <object class="GtkEntry" id="uname_textbox2">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="margin_top">5</property>
+                    <property name="editable">False</property>
                     <property name="invisible_char">●</property>
                     <property name="invisible_char_set">True</property>
                   </object>
@@ -284,9 +296,11 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkEntry" id="entry6">
+                  <object class="GtkEntry" id="pword_textbox2">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
+                    <property name="editable">False</property>
+                    <property name="visibility">False</property>
                     <property name="invisible_char">●</property>
                     <property name="invisible_char_set">True</property>
                   </object>
@@ -313,7 +327,7 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkLabel" id="label8">
+                  <object class="GtkLabel" id="uname_label2">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="xalign">1</property>
@@ -335,7 +349,9 @@
                     <property name="margin_left">80</property>
                     <property name="use_action_appearance">False</property>
                     <property name="xalign">0</property>
+                    <property name="active">True</property>
                     <property name="draw_indicator">True</property>
+                    <signal name="toggled" handler="toggle_auth2" swapped="no"/>
                   </object>
                   <packing>
                     <property name="left_attach">0</property>
@@ -345,7 +361,7 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkLabel" id="label9">
+                  <object class="GtkLabel" id="pword_label2">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="xalign">1</property>
@@ -359,9 +375,10 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkEntry" id="entry11">
+                  <object class="GtkEntry" id="port_textbox2">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
+                    <property name="editable">False</property>
                     <property name="invisible_char">●</property>
                   </object>
                   <packing>
@@ -406,9 +423,10 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkEntry" id="entry7">
+                  <object class="GtkEntry" id="proxy_textbox3">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
+                    <property name="editable">False</property>
                     <property name="invisible_char">●</property>
                     <property name="invisible_char_set">True</property>
                   </object>
@@ -420,10 +438,11 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkEntry" id="entry8">
+                  <object class="GtkEntry" id="uname_textbox3">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="margin_top">5</property>
+                    <property name="editable">False</property>
                     <property name="invisible_char">●</property>
                     <property name="invisible_char_set">True</property>
                   </object>
@@ -435,9 +454,11 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkEntry" id="entry9">
+                  <object class="GtkEntry" id="pword_textbox3">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
+                    <property name="editable">False</property>
+                    <property name="visibility">False</property>
                     <property name="invisible_char">●</property>
                     <property name="invisible_char_set">True</property>
                   </object>
@@ -464,7 +485,7 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkLabel" id="label12">
+                  <object class="GtkLabel" id="uname_label3">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="xalign">1</property>
@@ -486,7 +507,9 @@
                     <property name="margin_left">80</property>
                     <property name="use_action_appearance">False</property>
                     <property name="xalign">0</property>
+                    <property name="active">True</property>
                     <property name="draw_indicator">True</property>
+                    <signal name="toggled" handler="toggle_auth3" swapped="no"/>
                   </object>
                   <packing>
                     <property name="left_attach">0</property>
@@ -496,7 +519,7 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkLabel" id="label13">
+                  <object class="GtkLabel" id="pword_label3">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="xalign">1</property>
@@ -510,9 +533,10 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkEntry" id="entry12">
+                  <object class="GtkEntry" id="port_textbox3">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
+                    <property name="editable">False</property>
                     <property name="invisible_char">●</property>
                   </object>
                   <packing>
@@ -544,6 +568,7 @@
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <property name="margin_top">10</property>
+            <property name="margin_bottom">10</property>
             <child>
               <object class="GtkButton" id="button2">
                 <property name="label">gtk-ok</property>
@@ -552,12 +577,31 @@
                 <property name="receives_default">True</property>
                 <property name="use_action_appearance">False</property>
                 <property name="use_stock">True</property>
+                <signal name="clicked" handler="click_ok" swapped="no"/>
               </object>
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">True</property>
                 <property name="pack_type">end</property>
                 <property name="position">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkButton" id="button3">
+                <property name="label">gtk-apply</property>
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">True</property>
+                <property name="margin_right">10</property>
+                <property name="use_action_appearance">False</property>
+                <property name="use_stock">True</property>
+                <signal name="clicked" handler="click_apply" swapped="no"/>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="pack_type">end</property>
+                <property name="position">1</property>
               </packing>
             </child>
             <child>
@@ -569,12 +613,13 @@
                 <property name="margin_right">10</property>
                 <property name="use_action_appearance">False</property>
                 <property name="use_stock">True</property>
+                <signal name="clicked" handler="click_cancel" swapped="no"/>
               </object>
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">True</property>
                 <property name="pack_type">end</property>
-                <property name="position">1</property>
+                <property name="position">2</property>
               </packing>
             </child>
           </object>
@@ -583,9 +628,6 @@
             <property name="fill">True</property>
             <property name="position">4</property>
           </packing>
-        </child>
-        <child>
-          <placeholder/>
         </child>
       </object>
     </child>
