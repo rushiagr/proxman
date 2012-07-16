@@ -26,6 +26,7 @@
         <child>
           <object class="GtkRadioButton" id="radiobutton1">
             <property name="label" translatable="yes">No Proxy</property>
+            <property name="use_action_appearance">False</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="receives_default">False</property>
@@ -45,6 +46,7 @@
         <child>
           <object class="GtkRadioButton" id="radiobutton2">
             <property name="label" translatable="yes">Use Proxy</property>
+            <property name="use_action_appearance">False</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="receives_default">False</property>
@@ -71,7 +73,6 @@
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="margin_top">5</property>
-                <property name="n_columns">4</property>
                 <child>
                   <object class="GtkLabel" id="label2">
                     <property name="width_request">110</property>
@@ -166,10 +167,12 @@
                 <child>
                   <object class="GtkCheckButton" id="checkbutton1">
                     <property name="label" translatable="yes">Use Authentication</property>
+                    <property name="use_action_appearance">False</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">False</property>
                     <property name="margin_left">80</property>
+                    <property name="margin_right">80</property>
                     <property name="use_action_appearance">False</property>
                     <property name="xalign">0</property>
                     <property name="active">True</property>
@@ -224,6 +227,7 @@
             <child>
               <object class="GtkCheckButton" id="checkbutton4">
                 <property name="label" translatable="yes">Use same proxy for all protocols</property>
+                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">False</property>
@@ -245,7 +249,6 @@
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="margin_top">5</property>
-                <property name="n_columns">4</property>
                 <child>
                   <object class="GtkLabel" id="label6">
                     <property name="width_request">110</property>
@@ -340,10 +343,12 @@
                 <child>
                   <object class="GtkCheckButton" id="checkbutton2">
                     <property name="label" translatable="yes">Use Authentication</property>
+                    <property name="use_action_appearance">False</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">False</property>
                     <property name="margin_left">80</property>
+                    <property name="margin_right">80</property>
                     <property name="use_action_appearance">False</property>
                     <property name="xalign">0</property>
                     <property name="active">True</property>
@@ -399,7 +404,6 @@
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="margin_top">10</property>
-                <property name="n_columns">4</property>
                 <child>
                   <object class="GtkLabel" id="label10">
                     <property name="width_request">110</property>
@@ -494,10 +498,12 @@
                 <child>
                   <object class="GtkCheckButton" id="checkbutton3">
                     <property name="label" translatable="yes">Use Authentication</property>
+                    <property name="use_action_appearance">False</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">False</property>
                     <property name="margin_left">80</property>
+                    <property name="margin_right">80</property>
                     <property name="use_action_appearance">False</property>
                     <property name="xalign">0</property>
                     <property name="active">True</property>
@@ -564,6 +570,7 @@
             <child>
               <object class="GtkButton" id="button2">
                 <property name="label">gtk-ok</property>
+                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
@@ -581,6 +588,7 @@
             <child>
               <object class="GtkButton" id="button3">
                 <property name="label">gtk-apply</property>
+                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
@@ -599,6 +607,7 @@
             <child>
               <object class="GtkButton" id="button1">
                 <property name="label">gtk-cancel</property>
+                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
