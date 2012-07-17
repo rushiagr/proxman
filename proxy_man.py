@@ -1,21 +1,22 @@
 #! /usr/bin/env python
 
-# Case: When 'use auth' is not same for all three checkboxes, and you select 'use same proxy'
-
+import os
 import sys
 from gi.repository import Gtk  
 
-
+"""
+Class to display the main screen correctly and making it behave correctly.
+"""
 class ProxyMan:
-    def go(self, object_string):
-        return self.builder.get_object(object_string)
 
     def __init__( self ):
         self.builder = Gtk.Builder()
         self.builder.add_from_file("ui.glade")
-        self.go("grid2").set_sensitive(False)
-        self.go("grid3").set_sensitive(False)
-#        print self.go("checkbutton1").get_active()
+        self.builder.get_object("grid2").set_sensitive(False)
+        self.builder.get_object("grid3").set_sensitive(False)
+#        print self.builder.get_object("checkbutton1").get_active()
+        self.no_root = Gtk.Builder()
+        self.no_root.add_from_file("no_root.glade")
         
         dic = { 
             "on_quit_window" : self.quit,
@@ -38,116 +39,142 @@ class ProxyMan:
         
     
     def noProxy(self, widget):
-        self.go("grid1").set_sensitive(False)
-        self.go("grid2").set_sensitive(False)
-        self.go("grid3").set_sensitive(False)
-        self.go("checkbutton4").set_sensitive(False)
+        self.builder.get_object("grid1").set_sensitive(False)
+        self.builder.get_object("grid2").set_sensitive(False)
+        self.builder.get_object("grid3").set_sensitive(False)
+        self.builder.get_object("checkbutton4").set_sensitive(False)
 
     def useProxy(self, widget):
-        self.go("grid1").set_sensitive(True)
-        self.go("checkbutton4").set_sensitive(True)
-        if self.go("checkbutton4").get_active() == False:
-            self.go("grid2").set_sensitive(True)
-            self.go("grid3").set_sensitive(True)
+        self.builder.get_object("grid1").set_sensitive(True)
+        self.builder.get_object("checkbutton4").set_sensitive(True)
+        if self.builder.get_object("checkbutton4").get_active() == False:
+            self.builder.get_object("grid2").set_sensitive(True)
+            self.builder.get_object("grid3").set_sensitive(True)
         
     def useSameProxy(self, widget):
-        if self.go("checkbutton4").get_active() == True:
-            self.go("grid2").set_sensitive(False)
-            self.go("grid3").set_sensitive(False)
-            if self.go("checkbutton1").get_active() == True:
-                self.go("checkbutton2").set_active(True)
-                self.go("checkbutton3").set_active(True)
+        if self.builder.get_object("checkbutton4").get_active() == True:
+            self.builder.get_object("grid2").set_sensitive(False)
+            self.builder.get_object("grid3").set_sensitive(False)
+            if self.builder.get_object("checkbutton1").get_active() == True:
+                self.builder.get_object("checkbutton2").set_active(True)
+                self.builder.get_object("checkbutton3").set_active(True)
             else:
-                self.go("checkbutton2").set_active(False)
-                self.go("checkbutton3").set_active(False)
+                self.builder.get_object("checkbutton2").set_active(False)
+                self.builder.get_object("checkbutton3").set_active(False)
         else:
-            self.go("grid2").set_sensitive(True)
-            self.go("grid3").set_sensitive(True)
+            self.builder.get_object("grid2").set_sensitive(True)
+            self.builder.get_object("grid3").set_sensitive(True)
         
-        self.go("uname_textbox2").set_text(self.go("uname_textbox1").get_text())
-        self.go("uname_textbox3").set_text(self.go("uname_textbox1").get_text())
-        self.go("pword_textbox2").set_text(self.go("pword_textbox1").get_text())
-        self.go("pword_textbox3").set_text(self.go("pword_textbox1").get_text())
-        self.go("proxy_textbox2").set_text(self.go("proxy_textbox1").get_text())
-        self.go("proxy_textbox3").set_text(self.go("proxy_textbox1").get_text())
-        self.go("port_textbox2").set_text(self.go("port_textbox1").get_text())
-        self.go("port_textbox3").set_text(self.go("port_textbox1").get_text())
+        self.builder.get_object("uname_textbox2").set_text(self.builder.get_object("uname_textbox1").get_text())
+        self.builder.get_object("uname_textbox3").set_text(self.builder.get_object("uname_textbox1").get_text())
+        self.builder.get_object("pword_textbox2").set_text(self.builder.get_object("pword_textbox1").get_text())
+        self.builder.get_object("pword_textbox3").set_text(self.builder.get_object("pword_textbox1").get_text())
+        self.builder.get_object("proxy_textbox2").set_text(self.builder.get_object("proxy_textbox1").get_text())
+        self.builder.get_object("proxy_textbox3").set_text(self.builder.get_object("proxy_textbox1").get_text())
+        self.builder.get_object("port_textbox2").set_text(self.builder.get_object("port_textbox1").get_text())
+        self.builder.get_object("port_textbox3").set_text(self.builder.get_object("port_textbox1").get_text())
         
-        if self.go("checkbutton1").get_active() == True and self.go("checkbutton4").get_active() == True:
-            self.go("checkbutton2").set_active(True)
-            self.go("checkbutton3").set_active(True)
+        if self.builder.get_object("checkbutton1").get_active() == True and self.builder.get_object("checkbutton4").get_active() == True:
+            self.builder.get_object("checkbutton2").set_active(True)
+            self.builder.get_object("checkbutton3").set_active(True)
         self.toggleAuth2(widget)
         self.toggleAuth3(widget)
         
     def toggleAuth1(self, widget):
-        if self.go("checkbutton1").get_active() == False:
-            self.go("uname_label1").set_sensitive(False)
-            self.go("pword_label1").set_sensitive(False)
-            self.go("uname_textbox1").set_sensitive(False)
-            self.go("pword_textbox1").set_sensitive(False)
+        if self.builder.get_object("checkbutton1").get_active() == False:
+            self.builder.get_object("uname_label1").set_sensitive(False)
+            self.builder.get_object("pword_label1").set_sensitive(False)
+            self.builder.get_object("uname_textbox1").set_sensitive(False)
+            self.builder.get_object("pword_textbox1").set_sensitive(False)
         else:
-            self.go("uname_label1").set_sensitive(True)
-            self.go("pword_label1").set_sensitive(True)
-            self.go("uname_textbox1").set_sensitive(True)
-            self.go("pword_textbox1").set_sensitive(True)
-        if self.go("checkbutton1").get_active() == True and self.go("checkbutton4").get_active() == True:
-            self.go("checkbutton2").set_active(True)
-            self.go("checkbutton3").set_active(True)
+            self.builder.get_object("uname_label1").set_sensitive(True)
+            self.builder.get_object("pword_label1").set_sensitive(True)
+            self.builder.get_object("uname_textbox1").set_sensitive(True)
+            self.builder.get_object("pword_textbox1").set_sensitive(True)
+        if self.builder.get_object("checkbutton1").get_active() == True and self.builder.get_object("checkbutton4").get_active() == True:
+            self.builder.get_object("checkbutton2").set_active(True)
+            self.builder.get_object("checkbutton3").set_active(True)
         else:
-            if self.go("checkbutton1").get_active() == False and self.go("checkbutton4").get_active() == True:
-                self.go("checkbutton2").set_active(False)
-                self.go("checkbutton3").set_active(False)
+            if self.builder.get_object("checkbutton1").get_active() == False and self.builder.get_object("checkbutton4").get_active() == True:
+                self.builder.get_object("checkbutton2").set_active(False)
+                self.builder.get_object("checkbutton3").set_active(False)
     
     def toggleAuth2(self, widget):
-        if self.go("checkbutton2").get_active() == False:
-            self.go("uname_label2").set_sensitive(False)
-            self.go("pword_label2").set_sensitive(False)
-            self.go("uname_textbox2").set_sensitive(False)
-            self.go("pword_textbox2").set_sensitive(False)
-        elif self.go("checkbutton4").get_active() == False:
-            self.go("uname_label2").set_sensitive(True)
-            self.go("pword_label2").set_sensitive(True)
-            self.go("uname_textbox2").set_sensitive(True)
-            self.go("pword_textbox2").set_sensitive(True)
+        if self.builder.get_object("checkbutton2").get_active() == False:
+            self.builder.get_object("uname_label2").set_sensitive(False)
+            self.builder.get_object("pword_label2").set_sensitive(False)
+            self.builder.get_object("uname_textbox2").set_sensitive(False)
+            self.builder.get_object("pword_textbox2").set_sensitive(False)
+        elif self.builder.get_object("checkbutton4").get_active() == False:
+            self.builder.get_object("uname_label2").set_sensitive(True)
+            self.builder.get_object("pword_label2").set_sensitive(True)
+            self.builder.get_object("uname_textbox2").set_sensitive(True)
+            self.builder.get_object("pword_textbox2").set_sensitive(True)
     
     def toggleAuth3(self, widget):
-        if self.go("checkbutton3").get_active() == False:
-            self.go("uname_label3").set_sensitive(False)
-            self.go("pword_label3").set_sensitive(False)
-            self.go("uname_textbox3").set_sensitive(False)
-            self.go("pword_textbox3").set_sensitive(False)
-        elif self.go("checkbutton4").get_active() == False:
-            self.go("uname_label3").set_sensitive(True)
-            self.go("pword_label3").set_sensitive(True)
-            self.go("uname_textbox3").set_sensitive(True)
-            self.go("pword_textbox3").set_sensitive(True)
+        if self.builder.get_object("checkbutton3").get_active() == False:
+            self.builder.get_object("uname_label3").set_sensitive(False)
+            self.builder.get_object("pword_label3").set_sensitive(False)
+            self.builder.get_object("uname_textbox3").set_sensitive(False)
+            self.builder.get_object("pword_textbox3").set_sensitive(False)
+        elif self.builder.get_object("checkbutton4").get_active() == False:
+            self.builder.get_object("uname_label3").set_sensitive(True)
+            self.builder.get_object("pword_label3").set_sensitive(True)
+            self.builder.get_object("uname_textbox3").set_sensitive(True)
+            self.builder.get_object("pword_textbox3").set_sensitive(True)
     
     def proxyTextboxChanged(self, widget):
-        if self.go("checkbutton4").get_active() == True:
-            self.go("proxy_textbox2").set_text(self.go("proxy_textbox1").get_text())
-            self.go("proxy_textbox3").set_text(self.go("proxy_textbox1").get_text())
+        if self.builder.get_object("checkbutton4").get_active() == True:
+            self.builder.get_object("proxy_textbox2").set_text(self.builder.get_object("proxy_textbox1").get_text())
+            self.builder.get_object("proxy_textbox3").set_text(self.builder.get_object("proxy_textbox1").get_text())
     
     def portTextboxChanged(self, widget):
-        if self.go("checkbutton4").get_active() == True:
-            self.go("port_textbox2").set_text(self.go("port_textbox1").get_text())
-            self.go("port_textbox3").set_text(self.go("port_textbox1").get_text())
+        if self.builder.get_object("checkbutton4").get_active() == True:
+            self.builder.get_object("port_textbox2").set_text(self.builder.get_object("port_textbox1").get_text())
+            self.builder.get_object("port_textbox3").set_text(self.builder.get_object("port_textbox1").get_text())
     
     def unameTextboxChanged(self, widget):
-        if self.go("checkbutton4").get_active() == True:
-            self.go("uname_textbox2").set_text(self.go("uname_textbox1").get_text())
-            self.go("uname_textbox3").set_text(self.go("uname_textbox1").get_text())
+        if self.builder.get_object("checkbutton4").get_active() == True:
+            self.builder.get_object("uname_textbox2").set_text(self.builder.get_object("uname_textbox1").get_text())
+            self.builder.get_object("uname_textbox3").set_text(self.builder.get_object("uname_textbox1").get_text())
     
     def pwordTextboxChanged(self, widget):
-        if self.go("checkbutton4").get_active() == True:
-            self.go("pword_textbox2").set_text(self.go("pword_textbox1").get_text())
-            self.go("pword_textbox3").set_text(self.go("pword_textbox1").get_text())
+        if self.builder.get_object("checkbutton4").get_active() == True:
+            self.builder.get_object("pword_textbox2").set_text(self.builder.get_object("pword_textbox1").get_text())
+            self.builder.get_object("pword_textbox3").set_text(self.builder.get_object("pword_textbox1").get_text())
     
     def quit(self, widget):
         sys.exit(0)
-        
-proxyMan = ProxyMan()
-window = proxyMan.go("window1")
-window.show_all()
 
+
+"""
+Class to handle the behaviour when the program is not run as a root
+"""
+class NoRoot:
+    def __init__(self):
+        self.builder = Gtk.Builder()
+        self.builder.add_from_file("no_root.glade")
+        
+        dic = { 
+            "on_ok_button_click" : self.quit,
+        }
+        
+        self.builder.connect_signals( dic )
+        
+    def quit(self, widget):
+        sys.exit(0)
+        
+class ApplyProxy:
+    def no_proxy(self):
+        pass
+
+proxyMan = ProxyMan()
+window = proxyMan.builder.get_object("window1")
+window.show_all()
+if os.geteuid() != 0:
+    noRoot = NoRoot()
+    noroot = noRoot.builder.get_object("window1")
+    noroot.show_all()
+    
 Gtk.main()
 
