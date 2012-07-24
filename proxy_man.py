@@ -1,5 +1,10 @@
 #! /usr/bin/env python
 
+# Bugs: Either enter all the details of all the three types of proxies: http, ftp
+#       and ftp, or else none. No flexibility implemented so far.
+
+#       * what if any of the below files do not exist at all, and we need to create them?!
+
 import os
 import sys
 from gi.repository import Gtk  
@@ -165,9 +170,159 @@ class NoRoot:
         sys.exit(0)
         
 class ApplyProxy:
-    def no_proxy(self):
-        pass
+    def __init__(self, is_proxy=False, 
+                 proxy_address='', proxy_port='', 
+                 username='',password=''
+                 ):
+                 
+        # Fetching configuration information from all required text files
+        bashrc_file = open('/etc/bash.bashrc','r')
+        bashrc_contents = bashrc_file.readlines()
+        bashrc_file.close()
+        bashrc_file = open('/etc/bash.bashrc', 'w')
+        for i in bashrc_contents:
+            if i.lower().startswith('export http_proxy') or i.lower().startswith('export https_proxy') or i.lower().startswith('export ftp_proxy'):
+                i = ''
+        bashrc_file.write(''.join(bashrc_contents))
+        bashrc_file.close()
 
+        env_file = open('/etc/environment','r')
+        env_contents = env_file.readlines()
+        env_file.close()
+        env_file = open('/etc/environment','w')
+        for i in env_contents:
+            if i.lower().startswith('http_proxy') or i.lower().startswith('https_proxy') or i.lower().startswith('ftp_proxy'):
+                i = ''
+        env_file.write(''.join(env_contents))
+        env_file.close()
+        
+        aptconf_file = open('/etc/apt/apt.conf', 'w')
+        aptconf_file.write('')
+        aptconf_file.close()
+        
+        
+        if not is_proxy:
+            
+            # Update /root/.synaptic/synaptic.conf file
+            sconf_file = open('/root/.synaptic/synaptic.conf', 'w')
+            sconf_contents = sconf_file.readlines()
+            for i in sconf_contents:
+                if i.startswith('  UseProxy'):
+                    i = i.split('"')
+                    i[1] = '0'
+                    i = '"'.join(i)
+                break
+            sconf_file.writelines(sconf_contents)
+            sconf_file.close()
+            
+        else:
+            
+            # Validation
+            proxy_address_split = proxy_address.split('.')
+            if len(proxy_address_split) != 4:
+                sys.exit()
+            no_alpha_character = False
+            for i in proxy_address_split:
+                if not i.isdigit():
+                    no_alpha_character = True
+                    break
+            if no_alpha_character == True:
+                sys.exit()
+            
+            if not proxy_port.isdigit() or len(proxy_port) > 5:
+                sys.exit()
+                
+            if (username=='' and len(password) > 0) or ( len(username) > 0 and password==''):
+                sys.exit()
+            
+            authentication = True
+            if username=='' and password=='':
+                authentication = False
+                
+            # Update /etc/environment file
+            env_file = open('/etc/environment', 'w')
+            if authentication:
+                env_contents.append('http_proxy=http://' + username + ':' + password + '@' + proxy_address + ':' + proxy_port + '/\n')
+                env_contents.append('https_proxy=https://' + username + ':' + password + '@' + proxy_address + ':' + proxy_port + '/\n')
+                env_contents.append('ftp_proxy=ftp://' + username + ':' + password + '@' + proxy_address + ':' + proxy_port + '/\n')
+            else:
+                env_contents.append('export http_proxy=http://' + proxy_address + ':' + proxy_port + '/\n')
+                env_contents.append('export https_proxy=https://' + proxy_address + ':' + proxy_port + '/\n')
+                env_contents.append('export ftp_proxy=ftp://' + proxy_address + ':' + proxy_port + '/\n')
+
+            env_file.write(''.join(env_contents))
+            env_file.close()
+            
+            # Update /etc/bash.bashrc file
+            bashrc_file = open('/etc/bash.bashrc', 'w')
+            if authentication:
+                bashrc_contents.append('export http_proxy=http://' + username + ':' + password + '@' + proxy_address + ':' + proxy_port + '/\n')
+                bashrc_contents.append('export https_proxy=https://' + username + ':' + password + '@' + proxy_address + ':' + proxy_port + '/\n')
+                bashrc_contents.append('export ftp_proxy=ftp://' + username + ':' + password + '@' + proxy_address + ':' + proxy_port + '/\n')
+            else:
+                bashrc_contents.append('export http_proxy=http://' + proxy_address + ':' + proxy_port + '/\n')
+                bashrc_contents.append('export https_proxy=https://' + proxy_address + ':' + proxy_port + '/\n')
+                bashrc_contents.append('export ftp_proxy=ftp://' + proxy_address + ':' + proxy_port + '/\n')
+
+            bashrc_file.write(''.join(bashrc_contents))
+            bashrc_file.close()
+            
+            # Update /etc/apt/apt.conf file
+            aptconf_file = open('/etc/apt/apt.conf', 'w')
+            if authentication:
+                aptconf_file.write('Acquire::http::Proxy "http://' +  username + ':' + password + '@' + proxy_address + ':' + proxy_port + '/";\n')
+                aptconf_file.write('Acquire::https::Proxy "https://' +  username + ':' + password + '@' + proxy_address + ':' + proxy_port + '/";\n')
+                aptconf_file.write('Acquire::ftp::Proxy "ftp://' +  username + ':' + password + '@' + proxy_address + ':' + proxy_port + '/";\n')
+                aptconf_file.write('\n')
+            else:
+                aptconf_file.write('Acquire::http::Proxy "http://' + proxy_address + ':' + proxy_port + '/";\n')
+                aptconf_file.write('Acquire::https::Proxy "https://' + proxy_address + ':' + proxy_port + '/";\n')
+                aptconf_file.write('Acquire::ftp::Proxy "ftp://' + proxy_address + ':' + proxy_port + '/";\n')
+                aptconf_file.write('\n')
+            
+            aptconf_file.close()
+            
+            # Update /root/.synaptic/synaptic.conf file
+            sconf_file = open('/root/.synaptic/synaptic.conf', 'w')
+            sconf_contents = sconf_file.readlines()
+            for i in sconf_contents:
+                if i.startswith('  httpProxyUser'):
+                    if authentication:
+                        i = i.split('"')
+                        i[1] = username
+                        i = '"'.join(i)
+                    else:
+                        i = i.split('"')
+                        i[1] = ''
+                        i = '"'.join(i)
+                if i.startswith('  httpProxyPass'):
+                    if authentication:
+                        i = i.split('"')
+                        i[1] = password
+                        i = '"'.join(i)
+                    else:
+                        i = i.split('"')
+                        i[1] = ''
+                        i = '"'.join(i)
+                if i.startswith('  httpProxy'):
+                    i = i.split('"')
+                    i[1] = proxy_address
+                    i = '"'.join(i)
+                if i.startswith('  httpProxyPort'):
+                    i = i.split('"')
+                    i[1] = proxy_port
+                    i = '"'.join(i)
+                if i.startswith('  ftpProxy'):
+                    i = i.split('"')
+                    i[1] = proxy_address
+                    i = '"'.join(i)
+                if i.startswith('  ftpProxyPort'):
+                    i = i.split('"')
+                    i[1] = proxy_port
+                    i = '"'.join(i)
+            sconf_file.writelines(sconf_contents)
+            
+                    
 proxyMan = ProxyMan()
 window = proxyMan.builder.get_object("window1")
 window.show_all()
