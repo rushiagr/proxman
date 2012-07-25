@@ -26,7 +26,7 @@ class ProxyMan:
         dic = { 
             "on_quit_window" : self.quit,
             "click_cancel" : self.quit,
-            "click_apply" : self.quit,
+            "click_apply" : self.apply,
             "click_ok" : self.quit,
             "radio_click_no_proxy" : self.noProxy,
             "radio_click_use_proxy" : self.useProxy,
@@ -41,6 +41,15 @@ class ProxyMan:
         }
         
         self.builder.connect_signals( dic )
+        
+    def apply(self):
+        # TODO
+        
+        proxy_address = self.builder.get_object('proxy_textbox1').get_text()
+        proxy_port = self.builder.get_object('port_textbox1').get_text()
+        username = self.builder.get_object('uname_textbox1').get_text()
+        password = self.builder.get_object('pword_textbox1').get_text()
+        applyProxy = ApplyProxy(proxy_address, proxy_port, username, password)
         
     
     def noProxy(self, widget):
@@ -204,16 +213,17 @@ class ApplyProxy:
         if not is_proxy:
             
             # Update /root/.synaptic/synaptic.conf file
-            sconf_file = open('/root/.synaptic/synaptic.conf', 'w')
-            sconf_contents = sconf_file.readlines()
-            for i in sconf_contents:
-                if i.startswith('  UseProxy'):
-                    i = i.split('"')
-                    i[1] = '0'
-                    i = '"'.join(i)
-                break
-            sconf_file.writelines(sconf_contents)
-            sconf_file.close()
+            if os.path.exists('/root/.synaptic/synaptic.conf'):    # Potential race condition
+                sconf_file = open('/root/.synaptic/synaptic.conf', 'w')
+                sconf_contents = sconf_file.readlines()
+                for i in sconf_contents:
+                    if i.startswith('  UseProxy'):
+                        i = i.split('"')
+                        i[1] = '0'
+                        i = '"'.join(i)
+                    break
+                sconf_file.writelines(sconf_contents)
+                sconf_file.close()
             
         else:
             
@@ -283,45 +293,46 @@ class ApplyProxy:
             aptconf_file.close()
             
             # Update /root/.synaptic/synaptic.conf file
-            sconf_file = open('/root/.synaptic/synaptic.conf', 'w')
-            sconf_contents = sconf_file.readlines()
-            for i in sconf_contents:
-                if i.startswith('  httpProxyUser'):
-                    if authentication:
+            if os.path.exists('/root/.synaptic/synaptic.conf'):
+                sconf_file = open('/root/.synaptic/synaptic.conf', 'w')
+                sconf_contents = sconf_file.readlines()
+                for i in sconf_contents:
+                    if i.startswith('  httpProxyUser'):
+                        if authentication:
+                            i = i.split('"')
+                            i[1] = username
+                            i = '"'.join(i)
+                        else:
+                            i = i.split('"')
+                            i[1] = ''
+                            i = '"'.join(i)
+                    if i.startswith('  httpProxyPass'):
+                        if authentication:
+                            i = i.split('"')
+                            i[1] = password
+                            i = '"'.join(i)
+                        else:
+                            i = i.split('"')
+                            i[1] = ''
+                            i = '"'.join(i)
+                    if i.startswith('  httpProxy'):
                         i = i.split('"')
-                        i[1] = username
+                        i[1] = proxy_address
                         i = '"'.join(i)
-                    else:
+                    if i.startswith('  httpProxyPort'):
                         i = i.split('"')
-                        i[1] = ''
+                        i[1] = proxy_port
                         i = '"'.join(i)
-                if i.startswith('  httpProxyPass'):
-                    if authentication:
+                    if i.startswith('  ftpProxy'):
                         i = i.split('"')
-                        i[1] = password
+                        i[1] = proxy_address
                         i = '"'.join(i)
-                    else:
+                    if i.startswith('  ftpProxyPort'):
                         i = i.split('"')
-                        i[1] = ''
+                        i[1] = proxy_port
                         i = '"'.join(i)
-                if i.startswith('  httpProxy'):
-                    i = i.split('"')
-                    i[1] = proxy_address
-                    i = '"'.join(i)
-                if i.startswith('  httpProxyPort'):
-                    i = i.split('"')
-                    i[1] = proxy_port
-                    i = '"'.join(i)
-                if i.startswith('  ftpProxy'):
-                    i = i.split('"')
-                    i[1] = proxy_address
-                    i = '"'.join(i)
-                if i.startswith('  ftpProxyPort'):
-                    i = i.split('"')
-                    i[1] = proxy_port
-                    i = '"'.join(i)
-            sconf_file.writelines(sconf_contents)
-            
+                sconf_file.writelines(sconf_contents)
+            else: print 'no synaptic installed'    
                     
 proxyMan = ProxyMan()
 window = proxyMan.builder.get_object("window1")
