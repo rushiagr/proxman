@@ -8,7 +8,7 @@
 import os
 import sys
 from gi.repository import Gtk  
-
+import commands
 """
 Class to display the main screen correctly and making it behave correctly.
 """
@@ -26,7 +26,7 @@ class ProxyMan:
         dic = { 
             "on_quit_window" : self.quit,
             "click_cancel" : self.quit,
-            "click_apply" : self.apply,
+            "click_apply" : self.applyToSystem,
             "click_ok" : self.quit,
             "radio_click_no_proxy" : self.noProxy,
             "radio_click_use_proxy" : self.useProxy,
@@ -40,16 +40,20 @@ class ProxyMan:
             "pword_textbox1_changed" : self.pwordTextboxChanged,
         }
         
-        self.builder.connect_signals( dic )
+        self.builder.connect_signals( dic ) 
         
-    def apply(self):
+    def applyToSystem(self, widget):
         # TODO
-        
-        proxy_address = self.builder.get_object('proxy_textbox1').get_text()
-        proxy_port = self.builder.get_object('port_textbox1').get_text()
-        username = self.builder.get_object('uname_textbox1').get_text()
-        password = self.builder.get_object('pword_textbox1').get_text()
-        applyProxy = ApplyProxy(proxy_address, proxy_port, username, password)
+        if self.builder.get_object('radiobutton1').get_active() == True:
+            applyProxy = ApplyProxy(False)
+            print ' no proxy selected'
+        else:
+            proxy_address = self.builder.get_object('proxy_textbox1').get_text()
+            proxy_port = self.builder.get_object('port_textbox1').get_text()
+            username = self.builder.get_object('uname_textbox1').get_text()
+            password = self.builder.get_object('pword_textbox1').get_text()
+            print 'applying', proxy_address, proxy_port, username, password
+            applyProxy = ApplyProxy(True, proxy_address, proxy_port, username, password)
         
     
     def noProxy(self, widget):
@@ -189,19 +193,21 @@ class ApplyProxy:
         bashrc_contents = bashrc_file.readlines()
         bashrc_file.close()
         bashrc_file = open('/etc/bash.bashrc', 'w')
-        for i in bashrc_contents:
-            if i.lower().startswith('export http_proxy') or i.lower().startswith('export https_proxy') or i.lower().startswith('export ftp_proxy'):
-                i = ''
+        for i in range(len(bashrc_contents)):
+            if bashrc_contents[i].lower().startswith('export http_proxy') or bashrc_contents[i].lower().startswith('export https_proxy') or bashrc_contents[i].lower().startswith('export ftp_proxy'):
+                print 'actual line: ', bashrc_contents[i]
+                bashrc_contents[i] = ''
         bashrc_file.write(''.join(bashrc_contents))
         bashrc_file.close()
-
+        print 'contents of bashrc file:'
+        print commands.getoutput('cat /etc/bash.bashrc')
         env_file = open('/etc/environment','r')
         env_contents = env_file.readlines()
         env_file.close()
         env_file = open('/etc/environment','w')
-        for i in env_contents:
-            if i.lower().startswith('http_proxy') or i.lower().startswith('https_proxy') or i.lower().startswith('ftp_proxy'):
-                i = ''
+        for i in range(len(env_contents)):
+            if env_contents[i].lower().startswith('http_proxy') or env_contents[i].lower().startswith('https_proxy') or env_contents[i].lower().startswith('ftp_proxy'):
+                env_contents[i] = ''
         env_file.write(''.join(env_contents))
         env_file.close()
         
@@ -213,23 +219,40 @@ class ApplyProxy:
         if not is_proxy:
             
             # Update /root/.synaptic/synaptic.conf file
-            if os.path.exists('/root/.synaptic/synaptic.conf'):    # Potential race condition
-                sconf_file = open('/root/.synaptic/synaptic.conf', 'w')
+            print 'cat'
+            print commands.getoutput('cat /root/.synaptic/synaptic.conf')
+            if os.path.exists('/root/.synaptic/synaptic.conf') == True:    # Potential race condition
+                print 'cat'
+                print commands.getoutput('cat /root/.synaptic/synaptic.conf')
+                print 'dog'
+                sconf_file = open('/root/.synaptic/synaptic.conf', 'r')
                 sconf_contents = sconf_file.readlines()
-                for i in sconf_contents:
-                    if i.startswith('  UseProxy'):
-                        i = i.split('"')
-                        i[1] = '0'
-                        i = '"'.join(i)
-                    break
+                sconf_file.close()
+                sconf_file = open('/root/.synaptic/synaptic.conf', 'w')
+                print 'sconf contents', sconf_contents
+                for i in range(len(sconf_contents)):
+                    print 'line:', sconf_contents[i]
+                    if sconf_contents[i].startswith('  useProxy'):
+                        print 'woops!'
+                        sconf_contents[i] = sconf_contents[i].split('"')
+                        print 'a', sconf_contents[i]
+                        sconf_contents[i][1] = '0'
+                        print 'b', sconf_contents[i]
+                        sconf_contents[i] = '"'.join(sconf_contents[i])
+                        print 'c', sconf_contents[i]
+                        print 'okay done. value of i[1]', sconf_contents[i]
+                        break
                 sconf_file.writelines(sconf_contents)
                 sconf_file.close()
-            
+            else: print 'synaptic file is not there!;'
         else:
             
             # Validation
+            print 'entering valicaion'
+            print proxy_address
             proxy_address_split = proxy_address.split('.')
             if len(proxy_address_split) != 4:
+                print 'proxy address split";', proxy_address_split
                 sys.exit()
             no_alpha_character = False
             for i in proxy_address_split:
@@ -237,14 +260,18 @@ class ApplyProxy:
                     no_alpha_character = True
                     break
             if no_alpha_character == True:
+                print 'no alpha char'
                 sys.exit()
             
             if not proxy_port.isdigit() or len(proxy_port) > 5:
+                print 'port not proper'
                 sys.exit()
                 
-            if (username=='' and len(password) > 0) or ( len(username) > 0 and password==''):
+            if (username=='' and len(password) > 0) or ( len(username) > 0 and password==''):   
+                print 'uname or paswd null'
                 sys.exit()
             
+            print 'all authentication pased"'
             authentication = True
             if username=='' and password=='':
                 authentication = False
@@ -252,13 +279,13 @@ class ApplyProxy:
             # Update /etc/environment file
             env_file = open('/etc/environment', 'w')
             if authentication:
-                env_contents.append('http_proxy=http://' + username + ':' + password + '@' + proxy_address + ':' + proxy_port + '/\n')
-                env_contents.append('https_proxy=https://' + username + ':' + password + '@' + proxy_address + ':' + proxy_port + '/\n')
-                env_contents.append('ftp_proxy=ftp://' + username + ':' + password + '@' + proxy_address + ':' + proxy_port + '/\n')
+                env_contents.append('http_proxy="http://' + username + ':' + password + '@' + proxy_address + ':' + proxy_port + '/"\n')
+                env_contents.append('https_proxy="https://' + username + ':' + password + '@' + proxy_address + ':' + proxy_port + '/"\n')
+                env_contents.append('ftp_proxy="ftp://' + username + ':' + password + '@' + proxy_address + ':' + proxy_port + '/"\n')
             else:
-                env_contents.append('export http_proxy=http://' + proxy_address + ':' + proxy_port + '/\n')
-                env_contents.append('export https_proxy=https://' + proxy_address + ':' + proxy_port + '/\n')
-                env_contents.append('export ftp_proxy=ftp://' + proxy_address + ':' + proxy_port + '/\n')
+                env_contents.append('http_proxy="http://' + proxy_address + ':' + proxy_port + '/"\n')
+                env_contents.append('https_proxy="https://' + proxy_address + ':' + proxy_port + '/"\n')
+                env_contents.append('ftp_proxy="ftp://' + proxy_address + ':' + proxy_port + '/"\n')
 
             env_file.write(''.join(env_contents))
             env_file.close()
@@ -294,49 +321,56 @@ class ApplyProxy:
             
             # Update /root/.synaptic/synaptic.conf file
             if os.path.exists('/root/.synaptic/synaptic.conf'):
-                sconf_file = open('/root/.synaptic/synaptic.conf', 'w')
+                sconf_file = open('/root/.synaptic/synaptic.conf', 'r')
                 sconf_contents = sconf_file.readlines()
-                for i in sconf_contents:
-                    if i.startswith('  httpProxyUser'):
+                sconf_file.close()
+                sconf_file = open('/root/.synaptic/synaptic.conf', 'w')
+                for i in range(len(sconf_contents)):
+                    if sconf_contents[i].startswith('  httpProxyUser'):
                         if authentication:
-                            i = i.split('"')
-                            i[1] = username
-                            i = '"'.join(i)
+                            sconf_contents[i] = sconf_contents[i].split('"')
+                            sconf_contents[i][1] = username
+                            sconf_contents[i] = '"'.join(sconf_contents[i])
                         else:
-                            i = i.split('"')
-                            i[1] = ''
-                            i = '"'.join(i)
-                    if i.startswith('  httpProxyPass'):
+                            sconf_contents[i] = sconf_contents[i].split('"')
+                            sconf_contents[i][1] = ''
+                            sconf_contents[i] = '"'.join(sconf_contents[i])
+                    if sconf_contents[i].startswith('  httpProxyPass'):
                         if authentication:
-                            i = i.split('"')
-                            i[1] = password
-                            i = '"'.join(i)
+                            sconf_contents[i] = sconf_contents[i].split('"')
+                            sconf_contents[i][1] = password
+                            sconf_contents[i] = '"'.join(sconf_contents[i])
                         else:
-                            i = i.split('"')
-                            i[1] = ''
-                            i = '"'.join(i)
-                    if i.startswith('  httpProxy'):
-                        i = i.split('"')
-                        i[1] = proxy_address
-                        i = '"'.join(i)
-                    if i.startswith('  httpProxyPort'):
-                        i = i.split('"')
-                        i[1] = proxy_port
-                        i = '"'.join(i)
-                    if i.startswith('  ftpProxy'):
-                        i = i.split('"')
-                        i[1] = proxy_address
-                        i = '"'.join(i)
-                    if i.startswith('  ftpProxyPort'):
-                        i = i.split('"')
-                        i[1] = proxy_port
-                        i = '"'.join(i)
+                            sconf_contents[i] = sconf_contents[i].split('"')
+                            sconf_contents[i][1] = ''
+                            sconf_contents[i] = '"'.join(sconf_contents[i])
+                    if sconf_contents[i].startswith('  httpProxy '):
+                        sconf_contents[i] = sconf_contents[i].split('"')
+                        sconf_contents[i][1] = proxy_address
+                        sconf_contents[i] = '"'.join(sconf_contents[i])
+                    if sconf_contents[i].startswith('  httpProxyPort'):
+                        sconf_contents[i] = sconf_contents[i].split('"')
+                        sconf_contents[i][1] = proxy_port
+                        sconf_contents[i] = '"'.join(sconf_contents[i])
+                    if sconf_contents[i].startswith('  ftpProxy '):
+                        sconf_contents[i] = sconf_contents[i].split('"')
+                        sconf_contents[i][1] = proxy_address
+                        sconf_contents[i] = '"'.join(sconf_contents[i])
+                    if sconf_contents[i].startswith('  ftpProxyPort'):
+                        sconf_contents[i] = sconf_contents[i].split('"')
+                        sconf_contents[i][1] = proxy_port
+                        sconf_contents[i] = '"'.join(sconf_contents[i])
+                    if sconf_contents[i].startswith('  useProxy '):
+                        sconf_contents[i] = sconf_contents[i].split('"')
+                        sconf_contents[i][1] = proxy_address
+                        sconf_contents[i] = '"'.join(sconf_contents[i])
                 sconf_file.writelines(sconf_contents)
             else: print 'no synaptic installed'    
                     
 proxyMan = ProxyMan()
 window = proxyMan.builder.get_object("window1")
 window.show_all()
+print 'done'
 if os.geteuid() != 0:
     noRoot = NoRoot()
     noroot = noRoot.builder.get_object("window1")
