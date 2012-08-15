@@ -14,6 +14,9 @@ PROXY_ADDRESS_INCORRECT = 0
 PROXY_PORT_INCORRECT = 1
 PROXY_CREDENTIALS_INCORRECT = 2
 
+UNSET_EXISTING_VARIABLES = 3
+DO_NOTHING = 4
+
 
 """
 Class to display the main screen correctly and making it behave correctly.
@@ -25,7 +28,6 @@ class ProxyMan:
         self.builder.add_from_file("ui.glade")
         self.builder.get_object("grid2").set_sensitive(False)
         self.builder.get_object("grid3").set_sensitive(False)
-#        print self.builder.get_object("checkbutton1").get_active()
         self.popup = Gtk.Builder()
         self.popup.add_from_file("popup.glade")
         
@@ -33,7 +35,6 @@ class ProxyMan:
             "on_quit_window" : self.quit,
             "click_cancel" : self.quit,
             "click_apply" : self.applyToSystem,
-            "click_ok" : self.quit,
             "radio_click_no_proxy" : self.noProxy,
             "radio_click_use_proxy" : self.useProxy,
             "toggle_use_same_proxy" : self.useSameProxy,
@@ -51,13 +52,11 @@ class ProxyMan:
     def applyToSystem(self, widget):
         if self.builder.get_object('radiobutton1').get_active() == True:
             applyProxy = ApplyProxy(False)
-            print ' no proxy selected'
         else:
             proxy_address = self.builder.get_object('proxy_textbox1').get_text()
             proxy_port = self.builder.get_object('port_textbox1').get_text()
             username = self.builder.get_object('uname_textbox1').get_text()
             password = self.builder.get_object('pword_textbox1').get_text()
-            print 'applying', proxy_address, proxy_port, username, password
             credentials = Credentials(proxy_address, proxy_port, username, password)
             applyProxy = ApplyProxy(True, credentials)
         
@@ -187,6 +186,12 @@ class PopUp:
         
     def popup_text(self, new_string):
         self.builder.get_object('default_label').set_text(new_string)
+        
+class DestructionPopUp(PopUp):
+    """ Popup window created from this class destroys the whole program when 
+        one clicks on 'OK' button """
+    def on_click_ok(self, widget):
+        sys.exit()
 
 class Credentials:
     """ Class to hold the proxy credentials """
@@ -249,17 +254,22 @@ class Credentials:
 class ApplyProxy:
     def __init__(self, is_proxy=False, credentials=None):
         if is_proxy == False:
-            self.clearproxy()
+            self.clearproxy(UNSET_EXISTING_VARIABLES)
+            self.display_success()
         else:
             errors = credentials.validate()
             if len(errors) == 0:
-                self.clearproxy()
-                self.update_files(credentials) 
+                self.clearproxy(DO_NOTHING)
+                self.update_files(credentials)
+                self.display_success()
             else:
                 self.display_error(errors) ##
             
-    def clearproxy(self):
-        """ Removes existing proxy from the system """
+    def clearproxy(self, state):
+        """ Removes existing proxy from the system.
+            if the value of state is UNSET_EXISTING_VARIABLES, it unsets the 
+            existing proxy environment variables from the shells spawned after 
+            this program is executed """
         # Clearing /etc/bash.bashrc file
         bashrc_file = open('/etc/bash.bashrc','r')
         bashrc_contents = bashrc_file.readlines()
@@ -269,9 +279,19 @@ class ApplyProxy:
         for i in range(len(bashrc_contents)):
             if bashrc_contents[i].lower().startswith('export http_proxy') or \
                     bashrc_contents[i].lower().startswith('export https_proxy') or \
-                    bashrc_contents[i].lower().startswith('export ftp_proxy'):
+                    bashrc_contents[i].lower().startswith('export ftp_proxy') or \
+                    bashrc_contents[i].lower().startswith('unset http_proxy') or \
+                    bashrc_contents[i].lower().startswith('unset ftp_proxy') or \
+                    bashrc_contents[i].lower().startswith('unset https_proxy'):
+                    
                 bashrc_contents[i] = ''
         bashrc_file.write(''.join(bashrc_contents))
+        
+        if state == UNSET_EXISTING_VARIABLES:
+            bashrc_file.write('unset http_proxy\n')
+            bashrc_file.write('unset https_proxy\n')
+            bashrc_file.write('unset ftp_proxy\n')
+        
         bashrc_file.close()
         
         # Clearing /etc/environment file
@@ -388,6 +408,10 @@ class ApplyProxy:
         error_window.popup_text(error_text)
         error_window.builder.get_object('window1').show_all()
 
+    def display_success(self):
+        popup = DestructionPopUp()
+        popup.popup_text('Proxy applied to the system! :)')
+        popup.builder.get_object('window1').show_all()
 
 
 
@@ -395,10 +419,7 @@ proxyMan = ProxyMan()
 window = proxyMan.builder.get_object("window1")
 window.show_all()
 if os.geteuid() != 0:
-    class NoRoot(PopUp):
-        def on_click_ok(self, widget):
-            sys.exit()
-    noRoot = NoRoot()
+    noRoot = DestructionPopUp()
     noRoot.popup_text('Please run the application as ROOT user')
     noRoot.builder.get_object('window1').show_all()
     
