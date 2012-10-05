@@ -252,17 +252,17 @@ class ApplyProxy:
         for i in range(len(errorcodes)):
             error_text += ('    ' + str(i+1) + '. ' + disp_string[errorcodes[i]] + '\n')
         error_window.popup_text(error_text)
-        error_window.builder.get_object('window1').show_all()
+        error_window.builder.get_object('main_window').show_all()
 
     def display_success(self):
         popup = DestructionPopUp()
         popup.popup_text('Proxy applied to the system! :)')
-        popup.builder.get_object('window1').show_all()
+        popup.builder.get_object('main_window').show_all()
 
 
 
 proxyMan = ProxyMan()
-window = proxyMan.builder.get_object("window1")
+window = proxyMan.builder.get_object("main_window")
 window.show_all()
 if os.geteuid() != 0:
     noRoot = DestructionPopUp()
