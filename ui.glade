@@ -46,6 +46,9 @@
                 <property name="id_column">1</property>
                 <items>
                   <item translatable="yes">Select...</item>
+                  <item translatable="yes">One</item>
+                  <item translatable="yes">Two</item>
+                  <item translatable="yes">Three</item>
                 </items>
               </object>
               <packing>
@@ -62,6 +65,7 @@
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
                 <property name="use_action_appearance">False</property>
+                <signal name="clicked" handler="onclick_load_button" swapped="no"/>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -673,6 +677,7 @@
                 <property name="receives_default">True</property>
                 <property name="use_action_appearance">False</property>
                 <property name="use_stock">True</property>
+                <signal name="clicked" handler="onclick_save_button" swapped="no"/>
               </object>
               <packing>
                 <property name="expand">False</property>
