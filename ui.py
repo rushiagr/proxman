@@ -12,17 +12,16 @@ class PopUp:
     Class to manage a popup message window. Default action on clicking the OK 
     button is 'do nothing and close the popup window'
     """
-    def __init__(self):
+    def __init__(self, display_text=''):
         self.builder = Gtk.Builder()
         self.builder.add_from_file('popup.glade')
         dic = { 'on_ok_button_click' : self.on_click_ok, }
         self.builder.connect_signals(dic)
+        self.builder.get_object('default_label').set_text(display_text)
+        self.builder.get_object('main_window').show_all()
         
     def on_click_ok(self, widget):
         self.builder.get_object('main_window').destroy()
-        
-    def popup_text(self, new_string):
-        self.builder.get_object('default_label').set_text(new_string)
 
 
 class DestructionPopUp(PopUp):
@@ -30,36 +29,6 @@ class DestructionPopUp(PopUp):
     def on_click_ok(self, widget):
         sys.exit()
 
-class SavePopup:
-    """
-    Class for popup which appears and asks for the name by which one want to
-    save the profile as.
-    """
-    def __init__(self, profiles, default_save_name=''):
-        """ Profiles is list of profiles to pickle"""
-        self.builder = Gtk.Builder()
-        self.builder.add_from_file('save.glade')
-        dic = {
-            'onclick_save_button': self.onclick_save_button,
-            'onclick_cancel_button': self.onclick_cancel_button,
-        }
-        self.builder.connect_signals(dic)
-        self.builder.get_object('save_textbox').set_text(default_save_name)
-        self.profiles_list = profiles
-        
-    def onclick_save_button(self, widget):
-        last_correct_element = {
-            'name': self.builder.get_object('save_textbox').get_text(),
-            'value': self.profiles_list[-1]
-        }
-        self.profiles_list[-1] = last_correct_element
-        profile_file = open('profile.dat', 'wb')
-        pickle.dump(self.profiles_list,profile_file)
-        self.builder.get_object('main_window').destroy()
-        return 
-    
-    def onclick_cancel_button(self, widget):
-        self.builder.get_object('main_window').destroy()
 
 class MainWindow:
     """
@@ -87,7 +56,12 @@ class MainWindow:
         profile_file.close()
 
         for profile in self.saved_profiles:
-            self.obj('comboboxtext1').append_text(profile['name'])
+            self.obj('load_comboboxtext').append_text(profile['name'])
+            
+        default_profile_name = 'profile'+str(len(self.saved_profiles))
+
+        self.obj('save_textbox').set_text(default_profile_name)
+            
         
         dic = { 
             "onclick_quit_window": self.quit,
@@ -225,57 +199,63 @@ class MainWindow:
         errors = cred.validate()
         
         if len(errors) is not 0:
-            error_window = PopUp()
             error_text = 'Please check the following errors:\n'
             for i in range(len(errors)):
                 error_text += ('    ' + str(i+1) + '. ' + errors[i] + '\n')
-            error_window.popup_text(error_text)
-            error_window.builder.get_object('main_window').show_all()
+            error_window = PopUp(error_text)
             return
         
         if ApplyProxy(cred).status is 'success':
-            popup = DestructionPopUp()
-            popup.popup_text('Proxy applied to the system! :)')
-            popup.builder.get_object('main_window').show_all()
+            popup = DestructionPopUp('Proxy applied to the system! :)')
 
     def onclick_save_button(self, widget):
         #TODO(rushiagr): check if all the values from all fields are valid
+        name = self.obj('save_textbox').get_text()
+        value = self.get_data()
+
+        saved_profile_names = []
+        for profile in self.saved_profiles:
+            saved_profile_names.append(profile['name'])
         
-        #NOTE(rushiagr): here, the last element of profile_list is the
-        #       dictionary returned by function get_data. This last element
-        #       will be modified in SavePopup class.
+
+        if name in saved_profile_names:
+            conflict_popup = PopUp("'" + name +
+                                   "' already exist! Choose another name")
+            conflict_popup.builder.get_object('main_window').show_all()
+            return
         
-        profile_file = open('profile.dat', 'rb')
-        file_data = profile_file.readlines()
+        self.saved_profiles.append({'name': name, 'value':value})
+        
+        profile_file = open('profile.dat', 'wb')
+        pickle.dump(self.saved_profiles, profile_file)
         profile_file.close()
-        profile_file = open('profile.dat', 'rb')
         
-        if file_data[0] == '\n':
-            profile_list = []
-        else:
-            profile_list = pickle.load(profile_file)
-        
-        profile_file.close()
-        profile_list.append(self.get_data())
+        self.obj('load_comboboxtext').append_text(name)
         
         
-        default_profile_name = 'profile'+str(len(profile_list))
-        save_popup = SavePopup(profile_list, default_profile_name)
-        save_popup.builder.get_object('main_window').show_all()
+        increment = str(len(self.saved_profiles))
+
+        new_profile_name = 'profile' +  str(increment)
+            
+        while new_profile_name in saved_profile_names:
+            increment += 1
+            new_profile_name = 'profile' + str(increment)
         
+        self.obj('save_textbox').set_text(new_profile_name)
         
-        pass
-    
+        save_popup = PopUp("Values saved as profile name '"+name+"'.")
+#        save_popup.builder.get_object('main_window').show_all()
+        
+
     def onclick_load_button(self, widget):
 #        print self.saved_profiles
 #        self.set_data(self.saved_profiles)
-        selected = self.obj('comboboxtext1').get_active_text()
+        selected = self.obj('load_comboboxtext').get_active_text()
 #        print selected
         if selected is not None:
             for profile in self.saved_profiles:
                 if profile['name'] == selected:
                     self.set_data(profile['value'])
-        pass
     
     def onclick_not_use_proxy_radio(self, widget):
         for proxy_type in ['http', 'https', 'ftp']:
