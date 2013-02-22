@@ -1,15 +1,17 @@
+# Copyright (c) 2011-13 Rushi Agrawal.
+# See the file license.txt for copying permission.
+
+""" Class to help apply proxy values to the system."""
+
 import os
 import sys
-
-
 
 UNSET_EXISTING_VARIABLES = 3
 DO_NOTHING = 4
 
-
-
-
 class ApplyProxy:
+    """ Applies the proxy credentials to the system."""
+    
     def __init__(self, cred):
         if cred.data['noproxy'] is True:
             self.clearproxy(UNSET_EXISTING_VARIABLES)
